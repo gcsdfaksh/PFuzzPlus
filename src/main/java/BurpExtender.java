@@ -122,10 +122,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 //侧边复选框
                 JPanel jps=new JPanel();
                 jps.setLayout(new GridLayout(18, 1)); //六行一列
-                JLabel jls=new JLabel("插件名：瞎注 author：小熊科技");    //创建一个标签
-                JLabel jls_1=new JLabel("blog:www.nmd5.com");    //创建一个标签
+                JLabel jls=new JLabel("插件名：PFuzzPlus author：小熊科技");    //创建一个标签
                 JLabel jls_2=new JLabel("版本：PFuzzPlus V2.9");    //创建一个标签
-                JLabel jls_3=new JLabel("感谢名单：Moonlit、阿猫阿狗、Shincehor");    //创建一个标签
                 JCheckBox chkbox1=new JCheckBox("启动插件", true);    //创建指定文本和状态的复选框
                 JCheckBox chkbox2=new JCheckBox("监控Repeater");    //创建指定文本的复选框
                 JCheckBox chkbox3=new JCheckBox("监控Proxy");    //创建指定文本的复选框
@@ -342,9 +340,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 });
 
                 jps.add(jls);
-                jps.add(jls_1);
                 jps.add(jls_2);
-                jps.add(jls_3);
                 jps.add(chkbox1);
                 jps.add(chkbox2);
                 jps.add(chkbox3);
@@ -561,7 +557,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                     if(is_add == 0){
                         is_add = 1;
                     }
-                    temp_data += "+"+para.getName();
+                    temp_data += "+" + para.getName();
 
                     //判断是否为json嵌套 考虑性能消耗，判断json嵌套 和 json中带列表的  才用正则处理
                     if(para.getType() == 6 && request_data == null){
@@ -655,8 +651,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
 
                 //payload
                 ArrayList<String> payloads = new ArrayList<>();
-                payloads.add("'");
-                payloads.add("''");
+//                payloads.add("'");
+//                payloads.add("''");
 
 
 
@@ -693,9 +689,9 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                         if(JTextArea_int == 1){
                             //自定义payload //参数值为空
                             if(diy_payload_2 == 1){
-                                if(payload != "'" && payload !="''" && payload != "-1" && payload != "-0"){
+//                                if(payload != "'" && payload !="''" && payload != "-1" && payload != "-0"){
                                     value = "";
-                                }
+//                                }
                             }
                         }
 
@@ -704,7 +700,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
 
                         //新的请求包
                         IHttpRequestResponse requestResponse = null; //用于过if内的变量
-                        
+
                         if(para.getType() == 6){
                             List<String> headers = helpers.analyzeRequest(baseRequestResponse).getHeaders();
                             if(is_add ==1) {
@@ -715,9 +711,17 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                                 for (IParameter paras : paraList) {//循环所有参数，用来自定义json格式body做准备
                                     if (paras.getType() == 6) {//只要json格式的数据
                                         if (key == paras.getName() && value == paras.getValue()) {//判断现在的键和值是否是需要添加payload的键和值
-                                            newBody += "\"" + paras.getName() + "\":" + "\""  + "\",";//构造json的body
+                                            newBody += "\"" + paras.getName() + "\":" + "\"" + value + payload + "\",";//构造json的body
                                         } else {
-                                            newBody += "\"" + paras.getName() + "\":" + "\"" + "\",";//构造json的body
+                                            if (diy_payload_2 == 1){
+                                                if (key == paras.getName()){
+                                                    newBody += "\"" + paras.getName() + "\":" + "\"" + value + payload + "\",";//构造json的body
+                                                }else{
+                                                    newBody += "\"" + paras.getName() + "\":" + "\"" + paras.getValue() + "\",";//构造json的body
+                                                }
+                                            }else{
+                                                newBody += "\"" + paras.getName() + "\":" + "\"" + value + "\",";//构造json的body
+                                            }
                                         }
                                     }
                                 }
@@ -731,7 +735,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                                 time_1 = (int) System.currentTimeMillis();
                                 requestResponse = callbacks.makeHttpRequest(iHttpService, new_Requests);//发送请求
                                 time_2 = (int) System.currentTimeMillis();
-                            }else if (is_add ==2){
+                            }else if (is_add == 2){
                                 //json嵌套
                                 //stdout.println("json嵌套");
 
@@ -854,7 +858,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                         }else {
                             stdout.println("普通格式");
                             //不是json格式
-                            IParameter newPara = helpers.buildParameter(key,"", para.getType()); //构造新的参数
+                            IParameter newPara = helpers.buildParameter(key,value + payload, para.getType()); //构造新的参数
                             byte[] newRequest = helpers.updateParameter(new_Request, newPara);//更新请求包的参数
 
                             time_1 = (int) System.currentTimeMillis();

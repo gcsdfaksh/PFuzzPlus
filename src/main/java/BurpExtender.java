@@ -793,13 +793,21 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                                             if(request_data_body_temp.contains("\"")){//判断内容是否为字符串
                                                 request_data_body_temp = request_data_temp[i];
                                                 //修改内容，添加payload
-                                                request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$","$1$2"+payload+"$3");
+                                                if (diy_payload_2 == 1) {
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$","$1"+payload+"$3");
+                                                }else{
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$","$1$2"+payload+"$3");
+                                                }
                                                 stdout.println(request_data_body_temp);
                                                 request_data_body+= "\""+request_data_body_temp +",";
                                             }else {
                                                 request_data_body_temp = request_data_temp[i];
                                                 //修改内容，添加payload  纯数字
-                                                request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$","$1\"$2"+payload+"\"$3");
+                                                if (diy_payload_2 == 1) {
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$","$1\""+payload+"\"$3");
+                                                }else{
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$","$1\"$2"+payload+"\"$3");
+                                                }
                                                 stdout.println(request_data_body_temp);
                                                 request_data_body+= "\""+request_data_body_temp +",";
                                             }

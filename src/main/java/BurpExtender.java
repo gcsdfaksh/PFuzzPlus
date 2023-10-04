@@ -49,7 +49,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
     String JTextArea_data_1 = "";
     String diy_error_text = "";
     int diy_payload_1 = 1;
-    int diy_payload_2 = 0;
+    int diy_payload_2 = 1;
     int select_row = 0;
     Table logTable;
     int is_cookie = -1;
@@ -581,8 +581,11 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                         }
 
                         ArrayList<String> payloads = new ArrayList();
-                        payloads.add("'");
-                        payloads.add("''");
+                        if (diy_payload_2 != 1){
+                            payloads.add("'");
+                            payloads.add("''");
+                        }
+
                         if (para2.getType() == 0 || para2.getType() == 1 || para2.getType() == 6 || para2.getType() == this.is_cookie) {
                             String key = para2.getName();
                             String value = para2.getValue();
@@ -615,7 +618,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                                 payload = (String)var57.next();
                                 time_1 = 0;
                                 time_2 = 0;
-                                if (this.JTextArea_int == 1 && this.diy_payload_2 == 1 && payload != "'" && payload != "''" && payload != "-1" && payload != "-0") {
+//                                if (this.JTextArea_int == 1 && this.diy_payload_2 == 1 && payload != "'" && payload != "''" && payload != "-1" && payload != "-0") {
+                                if (this.JTextArea_int == 1 && this.diy_payload_2 == 1) {
                                     value = "";
                                 }
 
@@ -659,7 +663,16 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                                                 if (key == paras.getName() && value == paras.getValue()) {
                                                     newBody = newBody + "\"" + paras.getName() + "\":\"" + paras.getValue() + payload + "\",";
                                                 } else {
-                                                    newBody = newBody + "\"" + paras.getName() + "\":\"" + paras.getValue() + "\",";
+                                                    if (diy_payload_2 == 1){
+                                                        if (key == paras.getName()){
+                                                            newBody += "\"" + paras.getName() + "\":\"" + value + payload + "\",";//构造json的body
+                                                        }else{
+                                                            newBody += "\"" + paras.getName() + "\":\"" + paras.getValue() + "\",";//构造json的body
+                                                        }
+                                                    }else{
+                                                        newBody += "\"" + paras.getName() + "\":\"" + value + "\",";//构造json的body
+                                                    }
+//                                                    newBody = newBody + "\"" + paras.getName() + "\":\"" + paras.getValue() + "\",";
                                                 }
                                             }
                                         }
@@ -715,12 +728,20 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
 
                                                 if (request_data_body_temp.contains("\"")) {
                                                     request_data_body_temp = request_data_temp[i2];
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$", "$1$2" + payload + "$3");
+                                                    if (diy_payload_2 == 1){
+                                                        request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$", "$1" + payload + "$3");
+                                                    }else{
+                                                        request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$", "$1$2" + payload + "$3");
+                                                    }
                                                     this.stdout.println(request_data_body_temp);
                                                     request_data_body = request_data_body + "\"" + request_data_body_temp + ",";
                                                 } else {
                                                     request_data_body_temp = request_data_temp[i2];
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$", "$1\"$2" + payload + "\"$3");
+                                                    if (diy_payload_2 == 1){
+                                                        request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$", "$1\"" + payload + "\"$3");
+                                                    }else{
+                                                        request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$", "$1\"$2" + payload + "\"$3");
+                                                    }
                                                     this.stdout.println(request_data_body_temp);
                                                     request_data_body = request_data_body + "\"" + request_data_body_temp + ",";
                                                 }

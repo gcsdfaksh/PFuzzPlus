@@ -5,22 +5,15 @@
 
 import burp.*;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridLayout;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -29,20 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 
 public class BurpExtender extends AbstractTableModel implements IBurpExtender, ITab, IHttpListener, IScannerCheck, IMessageEditorController, IContextMenuFactory {
     private IBurpExtenderCallbacks callbacks;
@@ -82,12 +61,12 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
 
     public void registerExtenderCallbacks(final IBurpExtenderCallbacks callbacks) {
         this.stdout = new PrintWriter(callbacks.getStdout(), true);
-        this.stdout.println("hello xia sql!");
-        this.stdout.println("你好 欢迎使用 瞎注!");
-        this.stdout.println("version:3.3");
+        this.stdout.println("hello PFuzzPlus!");
+        this.stdout.println("你好 欢迎使用 PFuzzPlus!");
+        this.stdout.println("version:1.0");
         this.callbacks = callbacks;
         this.helpers = callbacks.getHelpers();
-        callbacks.setExtensionName("xia SQL V3.3");
+        callbacks.setExtensionName("PFuzzPlus V1.0");
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 BurpExtender.this.splitPane = new JSplitPane(1);
@@ -108,10 +87,8 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 jp.setRightComponent(tab_jp2);
                 JPanel jps = new JPanel();
                 jps.setLayout(new GridLayout(13, 1));
-                JLabel jls = new JLabel("插件名：瞎注 author：算命縖子");
-                JLabel jls_1 = new JLabel("blog:www.nmd5.com");
-                JLabel jls_2 = new JLabel("版本：xia SQL V3.3");
-                JLabel jls_3 = new JLabel("感谢名单：Moonlit、阿猫阿狗、Shincehor、jaikishantulswani");
+                JLabel jls = new JLabel("插件名：PFuzzPlus");
+                JLabel jls_2 = new JLabel("版本：PFuzzPlus V1.0");
                 final JCheckBox chkbox1 = new JCheckBox("启动插件", true);
                 final JCheckBox chkbox2 = new JCheckBox("监控Repeater");
                 final JCheckBox chkbox3 = new JCheckBox("监控Proxy");
@@ -140,7 +117,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 final JTextArea jta = new JTextArea("%df' and sleep(3)%23\n'and '1'='1", 18, 16);
 
                 try {
-                    BufferedReader in = new BufferedReader(new FileReader("xia_SQL_diy_payload.ini"));
+                    BufferedReader in = new BufferedReader(new FileReader("PFuzzPlus_diy_payload.ini"));
 
                     String str;
                     String str_data;
@@ -191,10 +168,10 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 chkbox1.addItemListener(new ItemListener() {
                     public void itemStateChanged(ItemEvent e) {
                         if (chkbox1.isSelected()) {
-                            BurpExtender.this.stdout.println("插件xia SQl启动");
+                            BurpExtender.this.stdout.println("插件PFuzzPlus启动");
                             BurpExtender.this.switchs = 1;
                         } else {
-                            BurpExtender.this.stdout.println("插件xia SQL关闭");
+                            BurpExtender.this.stdout.println("插件PFuzzPlus关闭");
                             BurpExtender.this.switchs = 0;
                         }
 
@@ -321,7 +298,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                         }
 
                         try {
-                            BufferedWriter out = new BufferedWriter(new FileWriter("xia_SQL_diy_payload.ini"));
+                            BufferedWriter out = new BufferedWriter(new FileWriter("PFuzzPlus_diy_payload.ini"));
                             out.write(BurpExtender.this.JTextArea_data_1);
                             out.close();
                         } catch (IOException var3) {
@@ -365,9 +342,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                     }
                 });
                 jps.add(jls);
-                jps.add(jls_1);
                 jps.add(jls_2);
-                jps.add(jls_3);
                 jps.add(chkbox1);
                 jps.add(chkbox2);
                 jps.add(chkbox3);
@@ -405,7 +380,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
     }
 
     public String getTabCaption() {
-        return "xia SQL";
+        return "PFuzzPlus";
     }
 
     public Component getUiComponent() {
@@ -440,7 +415,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
         List<JMenuItem> listMenuItems = new ArrayList(1);
         if (invocation.getToolFlag() == 64 || invocation.getToolFlag() == 4) {
             final IHttpRequestResponse[] responses = invocation.getSelectedMessages();
-            JMenuItem jMenu = new JMenuItem("Send to xia SQL");
+            JMenuItem jMenu = new JMenuItem("Send to PFuzzPlus");
             jMenu.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (BurpExtender.this.switchs == 1) {
@@ -457,7 +432,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                         });
                         thread.start();
                     } else {
-                        BurpExtender.this.stdout.println("插件xia SQL关闭状态！");
+                        BurpExtender.this.stdout.println("插件PFuzzPlus关闭状态！");
                     }
 
                 }

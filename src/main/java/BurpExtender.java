@@ -1,346 +1,373 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by FernFlower decompiler)
+//
+
 import burp.*;
 
-import java.io.*;
-import java.security.MessageDigest;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import java.awt.*;
-import java.awt.event.ItemListener;
-import javax.swing.JMenuItem;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
-
-
-public class BurpExtender extends AbstractTableModel implements IBurpExtender, ITab, IHttpListener,IScannerCheck, IMessageEditorController,IContextMenuFactory
-{
+public class BurpExtender extends AbstractTableModel implements IBurpExtender, ITab, IHttpListener, IScannerCheck, IMessageEditorController, IContextMenuFactory {
     private IBurpExtenderCallbacks callbacks;
     private IExtensionHelpers helpers;
     private JSplitPane splitPane;
     private IMessageEditor requestViewer;
     private IMessageEditor responseViewer;
-    private final List<LogEntry> log = new ArrayList<LogEntry>();//记录原始流量
-    private final List<LogEntry> log2 = new ArrayList<LogEntry>();//记录攻击流量
-    private final List<LogEntry> log3 = new ArrayList<LogEntry>();//用于展现
-    private final List<Request_md5> log4_md5 = new ArrayList<Request_md5>();//用于存放数据包的md5
+    private final List<LogEntry> log = new ArrayList();
+    private final List<LogEntry> log2 = new ArrayList();
+    private final List<LogEntry> log3 = new ArrayList();
+    private final List<Request_md5> log4_md5 = new ArrayList();
     private IHttpRequestResponse currentlyDisplayedItem;
+    JTextArea log_text;
     public PrintWriter stdout;
-    int switchs = 1; //开关 0关 1开
-    int clicks_Repeater=0;//64是监听 0是关闭
-    int clicks_Proxy=0;//4是监听 0是关闭
-    int conut = 0; //记录条数
-    String data_md5_id; //用于判断目前选中的数据包
+    int switchs = 1;
+    int clicks_Repeater = 0;
+    int clicks_Proxy = 0;
+    int conut = 0;
+    String data_md5_id;
     public AbstractTableModel model = new MyModel();
-    int original_data_len;//记录原始数据包的长度
-    int is_int = 1; //开关 0关 1开;//纯数据是否进行-1，-0
-    String temp_data; //用于保存临时内容
-    int JTextArea_int = 0;//自定义payload开关  0关 1开
-    String JTextArea_data_1 = "";//文本域的内容
-    int diy_payload_1 = 1;//自定义payload空格编码开关  0关 1开
-    int diy_payload_2 = 0;//自定义payload值置空开关  0关 1开
-    int select_row = 0;//选中表格的行数
-    Table logTable; //第一个表格框
-    int is_cookie = -1;//cookie是否要注入，-1关闭 2开启。
+    int original_data_len;
+    int is_int = 1;
+    String temp_data;
+    int JTextArea_int = 0;
+    String JTextArea_data_1 = "";
+    String diy_error_text = "";
+    int diy_payload_1 = 1;
+    int diy_payload_2 = 0;
+    int select_row = 0;
+    Table logTable;
+    int is_cookie = -1;
     String white_URL = "";
-    int white_switchs = 0;//白名单开关
+    int white_switchs = 0;
 
+    public BurpExtender() {
+    }
 
-
-
-
-    //
-    // implement IBurpExtender
-    //
-
-    @Override
-    public void registerExtenderCallbacks(final IBurpExtenderCallbacks callbacks)
-    {
-        //输出
+    public void registerExtenderCallbacks(final IBurpExtenderCallbacks callbacks) {
         this.stdout = new PrintWriter(callbacks.getStdout(), true);
-        this.stdout.println("hello PFuzzPlus!");
-        this.stdout.println("你好 欢迎使用 PFuzzPlus!");
-        this.stdout.println("version:2.9");
-
-
-
-        // keep a reference to our callbacks object
+        this.stdout.println("hello xia sql!");
+        this.stdout.println("你好 欢迎使用 瞎注!");
+        this.stdout.println("version:3.3");
         this.callbacks = callbacks;
+        this.helpers = callbacks.getHelpers();
+        callbacks.setExtensionName("xia SQL V3.3");
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                BurpExtender.this.splitPane = new JSplitPane(1);
+                JSplitPane splitPanes = new JSplitPane(0);
+                JSplitPane splitPanes_2 = new JSplitPane(0);
+                JSplitPane jp = new JSplitPane(1);
+                BurpExtender.this.logTable = BurpExtender.this.new Table(BurpExtender.this);
+                JScrollPane scrollPane = new JScrollPane(BurpExtender.this.logTable);
+                Table_log2 table = BurpExtender.this.new Table_log2(BurpExtender.this.model);
+                JScrollPane pane = new JScrollPane(table);
+                JPanel tab_jp1 = new JPanel();
+                tab_jp1.setLayout(new GridLayout(1, 1));
+                tab_jp1.add(scrollPane);
+                JPanel tab_jp2 = new JPanel();
+                tab_jp2.setLayout(new GridLayout(1, 1));
+                tab_jp2.add(pane);
+                jp.setLeftComponent(tab_jp1);
+                jp.setRightComponent(tab_jp2);
+                JPanel jps = new JPanel();
+                jps.setLayout(new GridLayout(13, 1));
+                JLabel jls = new JLabel("插件名：瞎注 author：算命縖子");
+                JLabel jls_1 = new JLabel("blog:www.nmd5.com");
+                JLabel jls_2 = new JLabel("版本：xia SQL V3.3");
+                JLabel jls_3 = new JLabel("感谢名单：Moonlit、阿猫阿狗、Shincehor、jaikishantulswani");
+                final JCheckBox chkbox1 = new JCheckBox("启动插件", true);
+                final JCheckBox chkbox2 = new JCheckBox("监控Repeater");
+                final JCheckBox chkbox3 = new JCheckBox("监控Proxy");
+                final JCheckBox chkbox4 = new JCheckBox("值是数字则进行-1、-0", true);
+                final JCheckBox chkbox8 = new JCheckBox("测试Cookie");
+                JLabel jls_5 = new JLabel("如果需要多个域名加白请用,隔开");
+                final JTextField textField = new JTextField("填写白名单域名");
+                JButton btn1 = new JButton("清空列表");
+                final JButton btn3 = new JButton("启动白名单");
+                JTabbedPane tab_diy = new JTabbedPane();
+                JSplitPane yx1_sp = new JSplitPane(0);
+                JPanel yx1_jp = new JPanel();
+                yx1_jp.setLayout(new GridLayout(5, 1));
+                JLabel jls_4 = new JLabel("修改payload后记得点击加载");
+                final JCheckBox chkbox5 = new JCheckBox("自定义payload");
+                final JCheckBox chkbox6 = new JCheckBox("自定义payload中空格url编码", true);
+                final JCheckBox chkbox7 = new JCheckBox("自定义payload中参数值置空");
+                JButton btn2 = new JButton("加载/重新加载payload");
+                yx1_jp.add(jls_4);
+                yx1_jp.add(chkbox5);
+                yx1_jp.add(chkbox6);
+                yx1_jp.add(chkbox7);
+                yx1_jp.add(btn2);
+                JPanel yx2_jp = new JPanel();
+                yx2_jp.setLayout(new GridLayout(1, 1));
+                final JTextArea jta = new JTextArea("%df' and sleep(3)%23\n'and '1'='1", 18, 16);
 
-        // obtain an extension helpers object
-        helpers = callbacks.getHelpers();
-
-        // set our extension name
-        callbacks.setExtensionName("PFuzzPlus V2.9");
-
-        // create our UI
-        SwingUtilities.invokeLater(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                // main split pane
-                splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-                JSplitPane splitPanes = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-                JSplitPane splitPanes_2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-                // table of log entries
-                logTable = new Table(BurpExtender.this);
-                JScrollPane scrollPane = new JScrollPane(logTable); //给列表添加滚动条
-
-
-
-                //test
-                JPanel jp=new JPanel();
-                JLabel jl=new JLabel("==>");    //创建一个标签
-
-                Table_log2 table=new Table_log2(model);
-                JScrollPane pane=new JScrollPane(table);//给列表添加滚动条
-
-                jp.add(scrollPane);    //将表格加到面板
-                jp.add(jl);    //将标签添加到面板
-                jp.add(pane);    //将表格加到面板
-
-                //侧边复选框
-                JPanel jps=new JPanel();
-                jps.setLayout(new GridLayout(18, 1)); //六行一列
-                JLabel jls=new JLabel("插件名：PFuzzPlus author：小熊科技");    //创建一个标签
-                JLabel jls_2=new JLabel("版本：PFuzzPlus V2.9");    //创建一个标签
-                JCheckBox chkbox1=new JCheckBox("启动插件", true);    //创建指定文本和状态的复选框
-                JCheckBox chkbox2=new JCheckBox("监控Repeater");    //创建指定文本的复选框
-                JCheckBox chkbox3=new JCheckBox("监控Proxy");    //创建指定文本的复选框
-                JCheckBox chkbox4=new JCheckBox("值是数字则进行-1、-0",true);    //创建指定文本的复选框
-                JLabel jls_4=new JLabel("修改payload后记得点击加载");    //创建一个标签
-                JCheckBox chkbox5=new JCheckBox("自定义payload");    //创建指定文本的复选框
-                JCheckBox chkbox6=new JCheckBox("自定义payload中空格url编码",true);    //创建指定文本的复选框
-                JCheckBox chkbox7=new JCheckBox("自定义payload中参数值置空");    //创建指定文本的复选框
-                JCheckBox chkbox8=new JCheckBox("测试Cookie");    //创建指定文本的复选框
-                JLabel jls_5=new JLabel("如果需要多个域名加白请用,隔开");    //创建一个标签
-                JTextField textField = new JTextField("填写白名单域名");//白名单文本框
-
-                //chkbox4.setEnabled(false);//设置为不可以选择
-
-                JButton btn1=new JButton("清空列表");    //创建JButton对象
-                JButton btn2=new JButton("加载/重新加载payload");    //创建JButton对象
-                JButton btn3=new JButton("启动白名单");    //处理白名单
-
-                //自定义payload区
-                JPanel jps_2=new JPanel();
-                jps_2.setLayout(new GridLayout(1, 1)); //六行一列
-                JTextArea jta=new JTextArea("%df' and sleep(3)%23\n'and '1'='1",18,16);
-
-                //读取ini配置文件
                 try {
                     BufferedReader in = new BufferedReader(new FileReader("xia_SQL_diy_payload.ini"));
-                    String str,str_data="";
-                    while ((str = in.readLine()) != null) {
-                        str_data += str+"\n";
+
+                    String str;
+                    String str_data;
+                    for(str_data = ""; (str = in.readLine()) != null; str_data = str_data + str + "\n") {
                     }
+
                     jta.setText(str_data);
-                } catch (IOException e) {
+                } catch (IOException var46) {
                 }
 
-                //jta.setLineWrap(true);    //设置文本域中的文本为自动换行
-                jta.setForeground(Color.BLACK);    //设置组件的背景色
-                jta.setFont(new Font("楷体",Font.BOLD,16));    //修改字体样式
-                jta.setBackground(Color.LIGHT_GRAY);    //设置背景色
-                jta.setEditable(false);//不可编辑状态
-                JScrollPane jsp=new JScrollPane(jta);    //将文本域放入滚动窗口
-                jps_2.add(jsp);    //将JScrollPane添加到JPanel容器中
-
-                //添加复选框监听事件
+                jta.setForeground(Color.BLACK);
+                jta.setFont(new Font("楷体", 1, 16));
+                jta.setBackground(Color.LIGHT_GRAY);
+                jta.setEditable(false);
+                JScrollPane jsp = new JScrollPane(jta);
+                yx2_jp.add(jsp);
+                yx1_sp.setLeftComponent(yx1_jp);
+                yx1_sp.setRightComponent(yx2_jp);
+                JSplitPane yx2_sp = new JSplitPane(0);
+                JPanel yx3_jp = new JPanel();
+                final JCheckBox chkbox_diy_error = new JCheckBox("自定义报错信息（支持正则表达式）", true);
+                yx3_jp.add(chkbox_diy_error);
+                JPanel yx4_jp = new JPanel();
+                yx4_jp.setLayout(new GridLayout(1, 1));
+                final JTextArea diy_error_jta = new JTextArea("ORA-\\d{5}\nSQL syntax.*?MySQL\nUnknown column\nSQL syntax\njava.sql.SQLSyntaxErrorException\nError SQL:\nSyntax error\n附近有语法错误\njava.sql.SQLException\n引号不完整\nSystem.Exception: SQL Execution Error!\ncom.mysql.jdbc\nMySQLSyntaxErrorException\nvalid MySQL result\nyour MySQL server version\nMySqlClient\nMySqlException\nvalid PostgreSQL result\nPG::SyntaxError:\norg.postgresql.jdbc\nPSQLException\nMicrosoft SQL Native Client error\nODBC SQL Server Driver\nSQLServer JDBC Driver\ncom.jnetdirect.jsql\nmacromedia.jdbc.sqlserver\ncom.microsoft.sqlserver.jdbc\nMicrosoft Access\nAccess Database Engine\nODBC Microsoft Access\nOracle error\nDB2 SQL error\nSQLite error\nSybase message\nSybSQLException", 18, 16);
+                diy_error_jta.setEditable(false);
+                diy_error_jta.setBackground(Color.LIGHT_GRAY);
+                JScrollPane diy_error_jsp = new JScrollPane(diy_error_jta);
+                BurpExtender.this.diy_error_text = diy_error_jta.getText();
+                yx4_jp.add(diy_error_jsp);
+                yx2_sp.setLeftComponent(yx3_jp);
+                yx2_sp.setRightComponent(yx4_jp);
+                JSplitPane yx3_sp = new JSplitPane(0);
+                JPanel yx5_jp = new JPanel();
+                JButton log_btn = new JButton("清空日志");
+                yx5_jp.add(log_btn);
+                JPanel yx6_jp = new JPanel();
+                yx6_jp.setLayout(new GridLayout(1, 1));
+                BurpExtender.this.log_text = new JTextArea("");
+                BurpExtender.this.log_text.setEditable(false);
+                JScrollPane log_sp = new JScrollPane(BurpExtender.this.log_text);
+                yx6_jp.add(log_sp);
+                yx3_sp.setLeftComponent(yx5_jp);
+                yx3_sp.setRightComponent(yx6_jp);
+                tab_diy.add("自定义sql语句", yx1_sp);
+                tab_diy.add("自定义报错信息", yx2_sp);
+                tab_diy.add("日志", yx3_sp);
                 chkbox1.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox1.isSelected()){
-                            stdout.println("插件PFuzzPlus启动");
-                            switchs = 1;
-                        }else {
-                            stdout.println("插件PFuzzPlus关闭");
-                            switchs = 0;
+                        if (chkbox1.isSelected()) {
+                            BurpExtender.this.stdout.println("插件xia SQl启动");
+                            BurpExtender.this.switchs = 1;
+                        } else {
+                            BurpExtender.this.stdout.println("插件xia SQL关闭");
+                            BurpExtender.this.switchs = 0;
                         }
 
                     }
                 });
                 chkbox2.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if (chkbox2.isSelected()){
-                            stdout.println("启动 监控Repeater");
-                            clicks_Repeater = 64;
-                        }else {
-                            stdout.println("关闭 监控Repeater");
-                            clicks_Repeater = 0;
+                        if (chkbox2.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 监控Repeater");
+                            BurpExtender.this.clicks_Repeater = 64;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 监控Repeater");
+                            BurpExtender.this.clicks_Repeater = 0;
                         }
+
                     }
                 });
                 chkbox3.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox3.isSelected()) {
-                            stdout.println("启动 监控Proxy");
-                            clicks_Proxy = 4;
-                        }else {
-                            stdout.println("关闭 监控Proxy");
-                            clicks_Proxy = 0;
+                        if (chkbox3.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 监控Proxy");
+                            BurpExtender.this.clicks_Proxy = 4;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 监控Proxy");
+                            BurpExtender.this.clicks_Proxy = 0;
                         }
+
                     }
                 });
                 chkbox4.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox4.isSelected()) {
-                            stdout.println("启动 值是数字则进行-1、-0");
-                            is_int = 1;
-                        }else {
-                            stdout.println("关闭 值是数字则进行-1、-0");
-                            is_int = 0;
+                        if (chkbox4.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 值是数字则进行-1、-0");
+                            BurpExtender.this.is_int = 1;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 值是数字则进行-1、-0");
+                            BurpExtender.this.is_int = 0;
                         }
+
                     }
                 });
-
                 chkbox5.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox5.isSelected()) {
-                            stdout.println("启动 自定义payload");
+                        if (chkbox5.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 自定义payload");
                             jta.setEditable(true);
-                            jta.setBackground(Color.WHITE);    //设置背景色
-                            JTextArea_int = 1;
-
-                            if (diy_payload_1 == 1){
+                            jta.setBackground(Color.WHITE);
+                            BurpExtender.this.JTextArea_int = 1;
+                            if (BurpExtender.this.diy_payload_1 == 1) {
                                 String temp_data = jta.getText();
-                                temp_data = temp_data.replaceAll(" ","%20");
-                                JTextArea_data_1 = temp_data;
-                            }else {
-                                JTextArea_data_1 = jta.getText();
+                                temp_data = temp_data.replaceAll(" ", "%20");
+                                BurpExtender.this.JTextArea_data_1 = temp_data;
+                            } else {
+                                BurpExtender.this.JTextArea_data_1 = jta.getText();
                             }
-
-                        }else {
-                            stdout.println("关闭 自定义payload");
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 自定义payload");
                             jta.setEditable(false);
-                            jta.setBackground(Color.LIGHT_GRAY);    //设置背景色
-                            JTextArea_int = 0;
+                            jta.setBackground(Color.LIGHT_GRAY);
+                            BurpExtender.this.JTextArea_int = 0;
                         }
+
                     }
                 });
-
                 chkbox6.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox6.isSelected()) {
-                            stdout.println("启动 空格url编码");
-                            diy_payload_1 = 1;
-
-                            //空格url编码
+                        if (chkbox6.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 空格url编码");
+                            BurpExtender.this.diy_payload_1 = 1;
                             String temp_data = jta.getText();
-                            temp_data = temp_data.replaceAll(" ","%20");
-                            JTextArea_data_1 = temp_data;
-                        }else {
-                            stdout.println("关闭 空格url编码");
-                            diy_payload_1 = 0;
-
-                            JTextArea_data_1 = jta.getText();
+                            temp_data = temp_data.replaceAll(" ", "%20");
+                            BurpExtender.this.JTextArea_data_1 = temp_data;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 空格url编码");
+                            BurpExtender.this.diy_payload_1 = 0;
+                            BurpExtender.this.JTextArea_data_1 = jta.getText();
                         }
+
                     }
                 });
-
                 chkbox7.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox7.isSelected()) {
-                            stdout.println("启动 自定义payload参数值置空");
-                            diy_payload_2 = 1;
-                        }else {
-                            stdout.println("关闭 自定义payload参数值置空");
-                            diy_payload_2 = 0;
+                        if (chkbox7.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 自定义payload参数值置空");
+                            BurpExtender.this.diy_payload_2 = 1;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 自定义payload参数值置空");
+                            BurpExtender.this.diy_payload_2 = 0;
                         }
+
                     }
                 });
-
                 chkbox8.addItemListener(new ItemListener() {
-                    @Override
                     public void itemStateChanged(ItemEvent e) {
-                        if(chkbox8.isSelected()) {
-                            stdout.println("启动 测试Cookie");
-                            is_cookie = 2;
-                        }else {
-                            stdout.println("关闭 测试Cookie");
-                            is_cookie = -1;
+                        if (chkbox8.isSelected()) {
+                            BurpExtender.this.stdout.println("启动 测试Cookie");
+                            BurpExtender.this.is_cookie = 2;
+                        } else {
+                            BurpExtender.this.stdout.println("关闭 测试Cookie");
+                            BurpExtender.this.is_cookie = -1;
                         }
+
                     }
                 });
-
-                btn1.addActionListener(new ActionListener() {//清空列表
-                    @Override
+                btn1.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        log.clear();//清除log的内容
-                        log2.clear();//清除log2的内容
-                        log3.clear();//清除log3的内容
-                        log4_md5.clear();//清除log4的内容
-                        conut = 0;
-                        fireTableRowsInserted(log.size(), log.size());//刷新列表中的展示
-                        model.fireTableRowsInserted(log3.size(), log3.size());//刷新列表中的展示
+                        BurpExtender.this.log.clear();
+                        BurpExtender.this.log2.clear();
+                        BurpExtender.this.log3.clear();
+                        BurpExtender.this.log4_md5.clear();
+                        BurpExtender.this.conut = 0;
+                        BurpExtender.this.fireTableRowsInserted(BurpExtender.this.log.size(), BurpExtender.this.log.size());
+                        BurpExtender.this.model.fireTableRowsInserted(BurpExtender.this.log3.size(), BurpExtender.this.log3.size());
                     }
                 });
-
-                btn2.addActionListener(new ActionListener() {//加载自定义payload
-                    @Override
+                btn2.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if (diy_payload_1 == 1){
+                        if (BurpExtender.this.diy_payload_1 == 1) {
                             String temp_data = jta.getText();
-                            temp_data = temp_data.replaceAll(" ","%20");
-                            JTextArea_data_1 = temp_data;
-                        }else {
-                            JTextArea_data_1 = jta.getText();
+                            temp_data = temp_data.replaceAll(" ", "%20");
+                            BurpExtender.this.JTextArea_data_1 = temp_data;
+                        } else {
+                            BurpExtender.this.JTextArea_data_1 = jta.getText();
                         }
-                        //写入ini配置文件
+
                         try {
                             BufferedWriter out = new BufferedWriter(new FileWriter("xia_SQL_diy_payload.ini"));
-                            out.write(JTextArea_data_1);
+                            out.write(BurpExtender.this.JTextArea_data_1);
                             out.close();
-                        } catch (IOException exception) {
+                        } catch (IOException var3) {
                         }
+
                     }
                 });
-                btn3.addActionListener(new ActionListener() {//加载自定义payload
-                    @Override
+                btn3.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        if(btn3.getText().equals("启动白名单")){
+                        if (btn3.getText().equals("启动白名单")) {
                             btn3.setText("关闭白名单");
-                            white_URL = textField.getText();
-                            white_switchs = 1;
+                            BurpExtender.this.white_URL = textField.getText();
+                            BurpExtender.this.white_switchs = 1;
                             textField.setEditable(false);
-                            textField.setForeground(Color.GRAY);//设置组件的背景色
-                        }else {
+                            textField.setForeground(Color.GRAY);
+                        } else {
                             btn3.setText("启动白名单");
-                            white_switchs = 0;
+                            BurpExtender.this.white_switchs = 0;
                             textField.setEditable(true);
                             textField.setForeground(Color.BLACK);
                         }
+
                     }
                 });
+                log_btn.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        BurpExtender.this.log_text.setText("");
+                    }
+                });
+                chkbox_diy_error.addItemListener(new ItemListener() {
+                    public void itemStateChanged(ItemEvent e) {
+                        if (chkbox_diy_error.isSelected()) {
+                            BurpExtender.this.diy_error_text = diy_error_jta.getText();
+                            diy_error_jta.setEditable(false);
+                            diy_error_jta.setBackground(Color.LIGHT_GRAY);
+                        } else {
+                            diy_error_jta.setEditable(true);
+                            diy_error_jta.setBackground(Color.WHITE);
+                        }
 
+                    }
+                });
                 jps.add(jls);
+                jps.add(jls_1);
                 jps.add(jls_2);
+                jps.add(jls_3);
                 jps.add(chkbox1);
                 jps.add(chkbox2);
                 jps.add(chkbox3);
@@ -350,625 +377,506 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                 jps.add(jls_5);
                 jps.add(textField);
                 jps.add(btn3);
-                jps.add(jls_4);
-                jps.add(chkbox5);
-                jps.add(chkbox6);
-                jps.add(chkbox7);
-                jps.add(btn2);
-
-
-
-
-
-
-                // tabs with request/response viewers
                 JTabbedPane tabs = new JTabbedPane();
-                requestViewer = callbacks.createMessageEditor(BurpExtender.this, false);
-                responseViewer = callbacks.createMessageEditor(BurpExtender.this, false);
-                tabs.addTab("Request", requestViewer.getComponent());
-                tabs.addTab("Response", responseViewer.getComponent());
-
-                //jp.add(tabs);
-
-                //右边
-                splitPanes_2.setLeftComponent(jps);//上面
-                splitPanes_2.setRightComponent(jps_2);//下面
-
-                //左边
-                splitPanes.setLeftComponent(jp);//上面
-                splitPanes.setRightComponent(tabs);//下面
-
-                //整体分布
-                splitPane.setLeftComponent(splitPanes);//添加在左面
-                splitPane.setRightComponent(splitPanes_2);//添加在右面
-                splitPane.setDividerLocation(1000);//设置分割的大小
-
-                // customize our UI components
-                callbacks.customizeUiComponent(splitPane);
-                callbacks.customizeUiComponent(logTable);
+                BurpExtender.this.requestViewer = callbacks.createMessageEditor(BurpExtender.this, false);
+                BurpExtender.this.responseViewer = callbacks.createMessageEditor(BurpExtender.this, false);
+                tabs.addTab("Request", BurpExtender.this.requestViewer.getComponent());
+                tabs.addTab("Response", BurpExtender.this.responseViewer.getComponent());
+                splitPanes_2.setLeftComponent(jps);
+                splitPanes_2.setRightComponent(tab_diy);
+                splitPanes.setLeftComponent(jp);
+                splitPanes.setRightComponent(tabs);
+                BurpExtender.this.splitPane.setLeftComponent(splitPanes);
+                BurpExtender.this.splitPane.setRightComponent(splitPanes_2);
+                BurpExtender.this.splitPane.setDividerLocation(1000);
+                callbacks.customizeUiComponent(BurpExtender.this.splitPane);
+                callbacks.customizeUiComponent(BurpExtender.this.logTable);
                 callbacks.customizeUiComponent(scrollPane);
                 callbacks.customizeUiComponent(pane);
                 callbacks.customizeUiComponent(jps);
                 callbacks.customizeUiComponent(jp);
                 callbacks.customizeUiComponent(tabs);
-
-                // add the custom tab to Burp's UI
                 callbacks.addSuiteTab(BurpExtender.this);
-
-                // register ourselves as an HTTP listener
                 callbacks.registerHttpListener(BurpExtender.this);
                 callbacks.registerScannerCheck(BurpExtender.this);
                 callbacks.registerContextMenuFactory(BurpExtender.this);
-
             }
         });
     }
-    //
-    // implement ITab
-    //
 
-    @Override
-    public String getTabCaption()
-    {
-        return "PFuzzPlus";
+    public String getTabCaption() {
+        return "xia SQL";
     }
 
-    @Override
-    public Component getUiComponent()
-    {
-        return splitPane;
+    public Component getUiComponent() {
+        return this.splitPane;
     }
 
-    //
-    // implement IHttpListener
-    //
+    public void processHttpMessage(final int toolFlag, boolean messageIsRequest, final IHttpRequestResponse messageInfo) {
+        if (this.switchs == 1 && (toolFlag == this.clicks_Repeater || toolFlag == this.clicks_Proxy) && !messageIsRequest) {
+            synchronized(this.log) {
+                Thread thread = new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            BurpExtender.this.checkVul(messageInfo, toolFlag);
+                        } catch (Exception var2) {
+                            var2.printStackTrace();
+                            BurpExtender.this.stdout.println(var2);
+                        }
 
-
-
-
-    @Override
-    public void processHttpMessage(int toolFlag, boolean messageIsRequest, IHttpRequestResponse messageInfo)
-    {
-
-        if(switchs == 1){//插件开关
-            if(toolFlag == clicks_Repeater || toolFlag == clicks_Proxy){//监听Repeater
-                // only process responses
-                if (!messageIsRequest)
-                {
-                    // create a new log entry with the message details
-                    synchronized(log)
-                    {
-                        //BurpExtender.this.checkVul(messageInfo,toolFlag);
-                        Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                try {
-                                    BurpExtender.this.checkVul(messageInfo,toolFlag);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                    BurpExtender.this.stdout.println(ex);
-                                }
-                            }
-                        });
-                        thread.start();
                     }
-                }
+                });
+                thread.start();
             }
-
         }
 
     }
 
-    @Override
     public List<IScanIssue> doPassiveScan(IHttpRequestResponse baseRequestResponse) {
         return null;
     }
 
-    @Override
-    public List<JMenuItem> createMenuItems(final IContextMenuInvocation invocation) {
-        //右键发送按钮功能
-
-        List<JMenuItem> listMenuItems = new ArrayList<JMenuItem>(1);
-        if(invocation.getToolFlag() == IBurpExtenderCallbacks.TOOL_REPEATER || invocation.getToolFlag() == IBurpExtenderCallbacks.TOOL_PROXY){
-            //父级菜单
-            IHttpRequestResponse[] responses = invocation.getSelectedMessages();
-            JMenuItem jMenu = new JMenuItem("Send to PFuzzPlus");
-
+    public List<JMenuItem> createMenuItems(IContextMenuInvocation invocation) {
+        List<JMenuItem> listMenuItems = new ArrayList(1);
+        if (invocation.getToolFlag() == 64 || invocation.getToolFlag() == 4) {
+            final IHttpRequestResponse[] responses = invocation.getSelectedMessages();
+            JMenuItem jMenu = new JMenuItem("Send to xia SQL");
             jMenu.addActionListener(new ActionListener() {
-                @Override
                 public void actionPerformed(ActionEvent e) {
-                    if(switchs == 1) {
-                        //不应在Swing事件调度线程中发出HTTP请求，所以需要创建一个Runnable并在 run() 方法中完成工作，后调用 new Thread(runnable).start() 来启动线程
+                    if (BurpExtender.this.switchs == 1) {
                         Thread thread = new Thread(new Runnable() {
                             public void run() {
                                 try {
                                     BurpExtender.this.checkVul(responses[0], 1024);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                    BurpExtender.this.stdout.println(ex);
+                                } catch (Exception var2) {
+                                    var2.printStackTrace();
+                                    BurpExtender.this.stdout.println(var2);
                                 }
+
                             }
                         });
                         thread.start();
-                    }else {
-                        BurpExtender.this.stdout.println("插件PFuzzPlus关闭状态！");
+                    } else {
+                        BurpExtender.this.stdout.println("插件xia SQL关闭状态！");
                     }
 
                 }
             });
-
             listMenuItems.add(jMenu);
+        }
 
-
-                                       }
-            //BurpExtender.this.checkVul(responses,4);
         return listMenuItems;
     }
 
-    private void checkVul(IHttpRequestResponse baseRequestResponse, int toolFlag){
+    private void checkVul(IHttpRequestResponse baseRequestResponse, int toolFlag) {
+        String change_sign_1 = "";
+        String error_sign = "";
+        List<IParameter> paraLists = this.helpers.analyzeRequest(baseRequestResponse).getParameters();
+        this.temp_data = String.valueOf(this.helpers.analyzeRequest(baseRequestResponse).getUrl());
+        String[] temp_data_strarray = this.temp_data.split("\\?");
+        String temp_data = temp_data_strarray[0];
+        String[] white_URL_list = this.white_URL.split(",");
+        boolean white_swith = false;
+        if (this.white_switchs == 1) {
+            white_swith = false;
 
-            int is_add; //用于判断是否要添加扫描
-            String change_sign_1 = ""; //用于显示第一个列表框的状态 变化 部分的内容
-
-            //把当前url和参数进行md5加密，用于判断该url是否已经扫描过
-            List<IParameter>paraLists= helpers.analyzeRequest(baseRequestResponse).getParameters();
-            temp_data = String.valueOf(helpers.analyzeRequest(baseRequestResponse).getUrl());//url
-            //stdout.println(temp_data);
-            String[] temp_data_strarray=temp_data.split("\\?");
-            String temp_data =(String) temp_data_strarray[0];//获取问号前面的字符串
-
-            //检测白名单
-            String[] white_URL_list = white_URL.split(",");
-            int white_swith = 0;
-            if(white_switchs == 1){
-                white_swith = 0;
-                for(int i=0;i<white_URL_list.length;i++){
-                    if(temp_data.contains(white_URL_list[i])){
-                        this.stdout.println("白名单URL！"+temp_data);
-                        white_swith = 1;
-                    }
-                }
-                if(white_swith == 0) {
-                    this.stdout.println("不是白名单URL！"+temp_data);
-                    return;
+            for(int i = 0; i < white_URL_list.length; ++i) {
+                if (temp_data.contains(white_URL_list[i])) {
+                    this.stdout.println("白名单URL！" + temp_data);
+                    white_swith = true;
                 }
             }
 
-            //用于判断页面后缀是否为静态文件
-            if(toolFlag == 4 || toolFlag ==64){//流量是Repeater与proxy来的就对其后缀判断
-                String[] static_file = {"jpg","png","gif","css","js","pdf","mp3","mp4","avi"};
-                String[] static_file_1 =temp_data.split("\\.");
-                String static_file_2 = static_file_1[static_file_1.length-1];//获取最后一个.内容
-                //this.stdout.println(static_file_2);
-                for(String i:static_file){
-                    if(static_file_2.equals(i)){
-                        this.stdout.println("当前url为静态文件："+temp_data+"\n");
-                        return;
-                    }
-                }
-            }
-
-        //stdout.println(temp_data);
-
-            String request_data = null;
-            String[] request_datas;
-            is_add = 0;
-            for (IParameter para : paraLists){// 循环获取参数，判断类型，再构造新的参数，合并到新的请求包中。
-                if (para.getType() == 0 || para.getType() == 1 || para.getType() == 6 || para.getType() == is_cookie) { //getTpe()就是来判断参数是在那个位置的
-                    if(is_add == 0){
-                        is_add = 1;
-                    }
-                    temp_data += "+" + para.getName();
-
-                    //判断是否为json嵌套 考虑性能消耗，判断json嵌套 和 json中带列表的  才用正则处理
-                    if(para.getType() == 6 && request_data == null){
-                        try {
-                            //stdout.println(helpers.bytesToString(baseRequestResponse.getRequest()));//查看数据包内容
-                            request_data = helpers.bytesToString(baseRequestResponse.getRequest()).split("\r\n\r\n")[1];
-                            //stdout.println(request_data);
-
-                            //json嵌套
-                            request_datas = request_data.split("\\{");
-                            if(request_datas.length >2){
-                                is_add = 2;
-                            }
-                            //json中有列表
-                            request_datas = request_data.split("\":\\[");
-                            if(request_datas.length >1){
-                                is_add = 2;
-                            }
-                        } catch (Exception e) {
-                            stdout.println(e);
-                        }
-                    }
-                }
-            }
-
-
-
-            //url+参数进行编码
-            temp_data += "+"+helpers.analyzeRequest(baseRequestResponse).getMethod();
-            //this.stdout.println(temp_data);
-            this.stdout.println("\nMD5(\""+temp_data+"\")");
-            temp_data = MD5(temp_data);
-            this.stdout.println(temp_data);
-
-
-
-            for (Request_md5 i : log4_md5){
-                if(i.md5_data.equals(temp_data)){//判断md5值是否一样，且右键发送过来的请求不进行md5验证
-                    if(toolFlag == 1024){
-                        temp_data = String.valueOf(System.currentTimeMillis());
-                        this.stdout.println(temp_data);
-                        temp_data = MD5(temp_data);
-                        this.stdout.println(temp_data);
-                    }else {
-                        return;
-                    }
-
-
-                }
-            }
-
-            //用于判断是否要处理这个请求
-            if (is_add != 0){
-                log4_md5.add(new Request_md5(temp_data));//保存对应对md5
-                stdout.println(is_add);
-                stdout.println(request_data);
-
-                int row = log.size();
-                try{
-                    original_data_len = callbacks.saveBuffersToTempFiles(baseRequestResponse).getResponse().length;//更新原始数据包的长度
-                    stdout.println(original_data_len);
-                    if(original_data_len <= 0){
-                        stdout.println("该数据包无响应");
-                        return;
-                    }
-                } catch (Exception ex) {
-                    stdout.println("该数据包无响应");
-                    return;
-                }
-
-                log.add(new LogEntry(conut,toolFlag, callbacks.saveBuffersToTempFiles(baseRequestResponse),helpers.analyzeRequest(baseRequestResponse).getUrl(),"","","",temp_data,0,"run……",999));
-                conut += 1;
-                fireTableRowsInserted(row, row);
-            }
-
-            //处理参数
-            List<IParameter>paraList= helpers.analyzeRequest(baseRequestResponse).getParameters();
-            byte[] new_Request = baseRequestResponse.getRequest();
-            int json_count = -1;//记录json嵌套次数
-
-            //****************************************
-            // 循环获取参数
-            //****************************************
-            String para_name = "";//用来记录上一次循环的参数名
-            for (IParameter para : paraList){// 循环获取参数
-                int switch_para = 0;//用来判断该参数是否要处理 0 要处理 1 跳过
-
-                if(para.getType() == 6){
-                    json_count += 1;
-                }
-
-                //payload
-                ArrayList<String> payloads = new ArrayList<>();
-//                payloads.add("'");
-//                payloads.add("''");
-
-
-
-                if (para.getType() == 0 || para.getType() == 1 || para.getType() == 6 || para.getType() == is_cookie){ //getTpe()就是来判断参数是在那个位置的
-                    String key = para.getName();//获取参数的名称
-                    String value = para.getValue();//获取参数的值
-                    stdout.println("\n\n原始数据："+key+":"+value);//输出原始的键值数据
-
-                    if(is_int == 1){//开关，用于判断是否要开启-1、-0的操作
-                        if (value.matches("[0-9]+")) {//用于判读参数的值是否为纯数字
-                            payloads.add("-1");
-                            payloads.add("-0");
-                        }
-                    }
-
-                    //自定义payload
-                    if(JTextArea_int == 1){
-                        String[] JTextArea_data = JTextArea_data_1.split("\n");
-                        for(String a:JTextArea_data){
-                            //stdout.println(a);
-                            //stdout.println("------");
-                            payloads.add(a);
-                        }
-                    }
-
-                    int change = 0; //用于判断返回包长度是否一致、保存第一次请求响应的长度
-
-                    //****************************************
-                    // 循环payload
-                    //****************************************
-                    for (String payload : payloads) {
-                        int time_1 = 0,time_2 = 0;
-
-                        if(JTextArea_int == 1){
-                            //自定义payload //参数值为空
-                            if(diy_payload_2 == 1){
-//                                if(payload != "'" && payload !="''" && payload != "-1" && payload != "-0"){
-                                    value = "";
-//                                }
-                            }
-                        }
-
-                        //stdout.println(key+":"+value+payload);//输出添加payload的键和值
-                        IHttpService iHttpService = baseRequestResponse.getHttpService();
-
-                        //新的请求包
-                        IHttpRequestResponse requestResponse = null; //用于过if内的变量
-
-                        if(para.getType() == 6){
-                            List<String> headers = helpers.analyzeRequest(baseRequestResponse).getHeaders();
-                            if(is_add ==1) {
-                                //json格式
-                                stdout.println("json");
-                                String newBody = "{"; //json body的内容
-
-                                for (IParameter paras : paraList) {//循环所有参数，用来自定义json格式body做准备
-                                    if (paras.getType() == 6) {//只要json格式的数据
-                                        if (key == paras.getName() && value == paras.getValue()) {//判断现在的键和值是否是需要添加payload的键和值
-                                            newBody += "\"" + paras.getName() + "\":" + "\"" + value + payload + "\",";//构造json的body
-                                        } else {
-                                            if (diy_payload_2 == 1){
-                                                if (key == paras.getName()){
-                                                    newBody += "\"" + paras.getName() + "\":" + "\"" + value + payload + "\",";//构造json的body
-                                                }else{
-                                                    newBody += "\"" + paras.getName() + "\":" + "\"" + paras.getValue() + "\",";//构造json的body
-                                                }
-                                            }else{
-                                                newBody += "\"" + paras.getName() + "\":" + "\"" + value + "\",";//构造json的body
-                                            }
-                                        }
-                                    }
-                                }
-
-                                newBody = newBody.substring(0, newBody.length() - 1); //去除最后一个,
-                                newBody += "}";//json body的内容
-
-                                byte[] bodyByte = newBody.getBytes();
-                                byte[] new_Requests = helpers.buildHttpMessage(headers, bodyByte); //关键方法
-
-                                time_1 = (int) System.currentTimeMillis();
-                                requestResponse = callbacks.makeHttpRequest(iHttpService, new_Requests);//发送请求
-                                time_2 = (int) System.currentTimeMillis();
-                            }else if (is_add == 2){
-                                //json嵌套
-                                //stdout.println("json嵌套");
-
-                                request_data = request_data.replaceAll("\r","");//burp2.x json自动格式美化处理
-                                request_data = request_data.replaceAll("\n","");//burp2.x json自动格式美化处理
-
-                                String[] request_data_temp = request_data.split(",\"");//用于临时保存切割的post体内容
-                                String request_data_body = "";//连接字符串
-                                String request_data_body_temp = "";//修改后的body和需要临时编辑的字符串
-
-
-                                for(int i=0;i < request_data_temp.length;i++){
-                                    if(i==json_count){//判断现在修改的参数
-                                        request_data_body_temp = request_data_temp[i];
-
-                                        stdout.println("准备修改的值："+request_data_body_temp);
-                                        while (true){
-                                            //空列表如："test":[]跳过处理
-                                            if(request_data_body_temp.contains(":[]")) {
-                                                stdout.println(request_data_body_temp+"跳过");
-                                                request_data_body += "\""+request_data_temp[i]+",";//把跳过的字符串连接上
-                                                json_count += 1;
-                                                i += 1;
-                                                request_data_body_temp = request_data_temp[i];
-                                            }else {
-                                                break;
-                                            }
-                                        }
-
-
-                                        //null、true、false等跳过处理
-                                        if(request_data_body_temp.toLowerCase().contains(":null") || request_data_body_temp.toLowerCase().contains(":true") || request_data_body_temp.toLowerCase().contains(":false")) {
-                                            stdout.println(request_data_body_temp+"跳过");
-                                            switch_para = 1;
-                                            break;
-                                        }
-
-
-                                        if(request_data_body_temp.contains("\":")){
-
-                                            if(para.getName().equals(para_name)){
-                                                //处理json嵌套列表，这种情况只跑一次
-                                                stdout.println("json嵌套列表，这个参数处理过了，跳过");
-                                                json_count -= 1;
-                                                switch_para = 1;
-                                                break;
-                                            }
-
-                                            //判断字符串中是否有":，如果有则为正常json内容
-                                            Pattern p = Pattern.compile(".*:\\s?\\[?\\s?(.*?$)");
-                                            Matcher m = p.matcher(request_data_body_temp);
-                                            if(m.find()){
-                                                request_data_body_temp = m.group(1);//获取:后面的内容
-                                            }
-                                            if(request_data_body_temp.contains("\"")){//判断内容是否为字符串
-                                                request_data_body_temp = request_data_temp[i];
-                                                //修改内容，添加payload
-                                                if (diy_payload_2 == 1) {
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$","$1"+payload+"$3");
-                                                }else{
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$","$1$2"+payload+"$3");
-                                                }
-                                                stdout.println(request_data_body_temp);
-                                                request_data_body+= "\""+request_data_body_temp +",";
-                                            }else {
-                                                request_data_body_temp = request_data_temp[i];
-                                                //修改内容，添加payload  纯数字
-                                                if (diy_payload_2 == 1) {
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$","$1\""+payload+"\"$3");
-                                                }else{
-                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$","$1\"$2"+payload+"\"$3");
-                                                }
-                                                stdout.println(request_data_body_temp);
-                                                request_data_body+= "\""+request_data_body_temp +",";
-                                            }
-
-                                        }else {
-                                            stdout.println("处理过，无需处理");
-                                            switch_para = 1;
-                                            if(para.getName().equals(para_name)){
-                                                //处理json嵌套列表，这种情况只跑一次
-                                                stdout.println("json嵌套列表，已经处理过第一个值");
-                                            }
-                                            break;
-
-                                            /*
-                                            //字符串中没有":，表示json格式中嵌套的列表
-
-                                            if(request_data_body_temp.contains("\"")) {//判断内容是否为字符串
-                                                //修改内容，添加payload
-                                                request_data_body_temp = request_data_body_temp.replaceAll("^(\")(.*?)(\".*?)$","$1$2"+payload+"$3");
-                                                request_data_body+= "\""+request_data_body_temp +",";
-                                            }else {
-                                                //不是字符串，则为纯数字
-                                                request_data_body_temp = request_data_body_temp.replaceAll("^(\\d*)(.*?)$","\"$1"+payload+"\"$2");
-                                                request_data_body+= "\""+request_data_body_temp +",";
-                                            }
-                                            */
-                                        }
-                                        //stdout.println(request_data_body_temp);
-
-
-                                    }else {
-                                        request_data_body += "\""+request_data_temp[i]+",";
-                                    }
-                                }
-
-                                if(switch_para == 1){
-                                    //跳过这个参数
-                                    break;
-                                }
-                                if(para.getName().equals(para_name)){
-                                    //处理json嵌套列表，这种情况只跑一次
-                                    stdout.println("json嵌套列表，已经处理过第一个值!!!!");
-                                }
-
-
-                                request_data_body = request_data_body.substring(0, request_data_body.length() - 1); //去除最后一个,
-                                request_data_body = request_data_body.substring(1,request_data_body.length()); //去除第一个"
-
-                                byte[] bodyByte = request_data_body.getBytes();
-                                byte[] new_Requests = helpers.buildHttpMessage(headers, bodyByte); //关键方法
-                                time_1 = (int) System.currentTimeMillis();
-                                requestResponse = callbacks.makeHttpRequest(iHttpService, new_Requests);//发送请求
-                                time_2 = (int) System.currentTimeMillis();
-
-                            }
-                        }else {
-                            stdout.println("普通格式");
-                            //不是json格式
-                            IParameter newPara = helpers.buildParameter(key,value + payload, para.getType()); //构造新的参数
-                            byte[] newRequest = helpers.updateParameter(new_Request, newPara);//更新请求包的参数
-
-                            time_1 = (int) System.currentTimeMillis();
-                            requestResponse = callbacks.makeHttpRequest(iHttpService, newRequest);//发送请求
-                            time_2 = (int) System.currentTimeMillis();
-
-                        }
-
-                        //判断数据长度是否会变化
-                        String change_sign;//第二个表格中 变化 的内容
-                        if(payload == "'" || payload == "-1" || change == 0){
-                            change = requestResponse.getResponse().length;//保存第一次请求响应的长度
-                            change_sign = "";
-                        }else{
-                            if(payload == "''" || payload == "-0" ){
-                                if(change != requestResponse.getResponse().length){//判断第一次的长度和现在的是否不同
-                                    if(payload == "''" && requestResponse.getResponse().length == original_data_len || payload == "-0" && requestResponse.getResponse().length == original_data_len){//判断两个单引号的长度和第一次的不一样且和原始包的长度一致
-                                        //原始包的长度和两个双引号的长度相同且和一个单引号的长度不同
-                                        change_sign = "✔ ==> ?";
-                                        change_sign_1 = " ✔";
-                                    }else{
-                                        //第一次的包和第二次包的长度不同
-                                        change_sign = "✔ "+ (change-requestResponse.getResponse().length);
-                                        change_sign_1 = " ✔";
-                                    }
-                                }else {
-                                    //第一次包和第二次包的长度一样
-                                    change_sign = "";
-                                }
-                            }else {
-                                //自定义payload
-                                if(time_2-time_1 >= 3000){
-                                    //响应时间大于3秒
-                                    change_sign = "time > 3";
-                                    change_sign_1 = " ✔";
-                                }else {
-                                    change_sign = "diy payload";
-                                }
-                            }
-
-                        }
-                        //把响应内容保存在log2中
-                        log2.add(new LogEntry(conut,toolFlag, callbacks.saveBuffersToTempFiles(requestResponse),helpers.analyzeRequest(requestResponse).getUrl(),key,value+payload,change_sign,temp_data,time_2-time_1,"end",helpers.analyzeResponse(requestResponse.getResponse()).getStatusCode()));
-
-                    }
-                }
-                para_name = para.getName();//用于判断json嵌套里面有列表，列表中带值只跑一次
-                stdout.println(json_count);
-
-            }
-
-        //用于更新是否已经跑完所有payload的状态
-        for(int i = 0; i < log.size(); i++){
-            if(temp_data.equals(log.get(i).data_md5)){
-                log.get(i).setState("end!"+change_sign_1);
-                //stdout.println("ok");
+            if (!white_swith) {
+                this.stdout.println("不是白名单URL！" + temp_data);
+                return;
             }
         }
 
-        //刷新第一个列表框
-        //BurpExtender.this.fireTableRowsInserted(log.size(), log.size());
-        BurpExtender.this.fireTableDataChanged();
-        //第一个表格 继续选中之前选中的值
-        BurpExtender.this.logTable.setRowSelectionInterval(BurpExtender.this.select_row,BurpExtender.this.select_row);
+        String[] request_datas;
+        int json_count;
+        int i;
+        if (toolFlag == 4 || toolFlag == 64) {
+            String[] static_file = new String[]{"jpg", "png", "gif", "css", "js", "pdf", "mp3", "mp4", "avi"};
+            request_datas = temp_data.split("\\.");
+            String static_file_2 = request_datas[request_datas.length - 1];
+            String[] var14 = static_file;
+            json_count = static_file.length;
 
+            for(int var16 = 0; var16 < json_count; ++var16) {
+                String i2 = var14[var16];
+                if (static_file_2.equals(i2)) {
+                    this.stdout.println("当前url为静态文件：" + temp_data + "\n");
+                    return;
+                }
+            }
 
+            IResponseInfo responseInfo = this.callbacks.getHelpers().analyzeResponse(baseRequestResponse.getResponse());
+            byte[] responseBody = Arrays.copyOfRange(baseRequestResponse.getResponse(), responseInfo.getBodyOffset(), baseRequestResponse.getResponse().length);
+            InputStream inputStream = new ByteArrayInputStream(responseBody);
+            i = 0;
+            byte[] buffer = new byte[8];
 
+            try {
+                i = inputStream.read(buffer);
+            } catch (IOException var38) {
+                var38.printStackTrace();
+            }
+
+            if (i >= 2 && buffer[0] == -1 && buffer[1] == -40) {
+                this.stdout.println("当前url的响应包为jpg图片：" + temp_data + "\n");
+                return;
+            }
+
+            if (i >= 4 && buffer[0] == -119 && buffer[1] == 80 && buffer[2] == 78 && buffer[3] == 71) {
+                this.stdout.println("当前url的响应包为png图片：" + temp_data + "\n");
+                return;
+            }
+
+            if (i >= 2 && buffer[0] == 71 && buffer[1] == 73) {
+                this.stdout.println("当前url的响应包为gif图片：" + temp_data + "\n");
+                return;
+            }
+
+            System.out.println("返回的不是图片");
+        }
+
+        String request_data = null;
+        int is_add = 0;
+        Iterator var42 = paraLists.iterator();
+
+        while(true) {
+            IParameter para;
+            do {
+                if (!var42.hasNext()) {
+                    temp_data = temp_data + "+" + this.helpers.analyzeRequest(baseRequestResponse).getMethod();
+                    this.stdout.println("\nMD5(\"" + temp_data + "\")");
+                    temp_data = MD5(temp_data);
+                    this.stdout.println(temp_data);
+                    var42 = this.log4_md5.iterator();
+
+                    while(var42.hasNext()) {
+                        Request_md5 i2 = (Request_md5)var42.next();
+                        if (i2.md5_data.equals(temp_data)) {
+                            if (toolFlag != 1024) {
+                                return;
+                            }
+
+                            temp_data = String.valueOf(System.currentTimeMillis());
+                            this.stdout.println(temp_data);
+                            temp_data = MD5(temp_data);
+                            this.stdout.println(temp_data);
+                        }
+                    }
+
+                    if (is_add != 0) {
+                        this.log4_md5.add(new Request_md5(temp_data));
+                        this.stdout.println(is_add);
+                        this.stdout.println(request_data);
+                        int row = this.log.size();
+
+                        try {
+                            this.original_data_len = this.callbacks.saveBuffersToTempFiles(baseRequestResponse).getResponse().length;
+                            this.stdout.println(this.original_data_len);
+                            if (this.original_data_len <= 0) {
+                                this.stdout.println("该数据包无响应");
+                                return;
+                            }
+                        } catch (Exception var39) {
+                            this.stdout.println("该数据包无响应");
+                            return;
+                        }
+
+                        this.log.add(new LogEntry(this.conut, toolFlag, this.callbacks.saveBuffersToTempFiles(baseRequestResponse), this.helpers.analyzeRequest(baseRequestResponse).getUrl(), "", "", "", temp_data, 0, "run……", 999));
+                        ++this.conut;
+                        this.fireTableRowsInserted(row, row);
+                    }
+
+                    List<IParameter> paraList = this.helpers.analyzeRequest(baseRequestResponse).getParameters();
+                    byte[] new_Request = baseRequestResponse.getRequest();
+                    json_count = -1;
+                    String para_name = "";
+                    Iterator var54 = paraList.iterator();
+
+                    while(var54.hasNext()) {
+                        IParameter para2 = (IParameter)var54.next();
+                        boolean switch_para = false;
+                        if (para2.getType() == 6) {
+                            ++json_count;
+                        }
+
+                        ArrayList<String> payloads = new ArrayList();
+                        payloads.add("'");
+                        payloads.add("''");
+                        if (para2.getType() == 0 || para2.getType() == 1 || para2.getType() == 6 || para2.getType() == this.is_cookie) {
+                            String key = para2.getName();
+                            String value = para2.getValue();
+                            this.stdout.println("\n\n原始数据：" + key + ":" + value);
+                            int time_1;
+                            if (this.JTextArea_int == 1) {
+                                String[] JTextArea_data = this.JTextArea_data_1.split("\n");
+                                payloads.clear();
+                                String[] var24 = JTextArea_data;
+                                int var25 = JTextArea_data.length;
+
+                                for(time_1 = 0; time_1 < var25; ++time_1) {
+                                    String a = var24[time_1];
+                                    payloads.add(a);
+                                }
+                            }
+
+                            if (this.is_int == 1 && value.matches("[0-9]+")) {
+                                payloads.add("-1");
+                                payloads.add("-0");
+                            }
+
+                            int change = 0;
+
+                            IHttpRequestResponse requestResponse;
+                            String payload;
+                            int time_2;
+                            String change_sign;
+                            for(Iterator var57 = payloads.iterator(); var57.hasNext(); this.log2.add(new LogEntry(this.conut, toolFlag, this.callbacks.saveBuffersToTempFiles(requestResponse), this.helpers.analyzeRequest(requestResponse).getUrl(), key, value + payload, change_sign, temp_data, time_2 - time_1, "end", this.helpers.analyzeResponse(requestResponse.getResponse()).getStatusCode()))) {
+                                payload = (String)var57.next();
+                                time_1 = 0;
+                                time_2 = 0;
+                                if (this.JTextArea_int == 1 && this.diy_payload_2 == 1 && payload != "'" && payload != "''" && payload != "-1" && payload != "-0") {
+                                    value = "";
+                                }
+
+                                IHttpService iHttpService = baseRequestResponse.getHttpService();
+                                requestResponse = null;
+                                String[] request_data_temp;
+                                Pattern p;
+                                if (para2.getType() != 6) {
+                                    this.stdout.println("普通格式");
+                                    IParameter newPara = this.helpers.buildParameter(key, value + payload, para2.getType());
+                                    byte[] newRequest = this.helpers.updateParameter(new_Request, newPara);
+                                    time_1 = (int)System.currentTimeMillis();
+                                    requestResponse = this.callbacks.makeHttpRequest(iHttpService, newRequest);
+                                    time_2 = (int)System.currentTimeMillis();
+                                } else {
+                                    List<String> headers = this.helpers.analyzeRequest(baseRequestResponse).getHeaders();
+                                    if (is_add == 1) {
+                                        this.stdout.println("json");
+                                        String newBody = "{";
+                                        Iterator var64 = paraList.iterator();
+
+                                        label261:
+                                        while(true) {
+                                            while(true) {
+                                                IParameter paras;
+                                                do {
+                                                    if (!var64.hasNext()) {
+                                                        newBody = newBody.substring(0, newBody.length() - 1);
+                                                        newBody = newBody + "}";
+                                                        byte[] bodyByte = newBody.getBytes();
+                                                        byte[] new_Requests = this.helpers.buildHttpMessage(headers, bodyByte);
+                                                        time_1 = (int)System.currentTimeMillis();
+                                                        requestResponse = this.callbacks.makeHttpRequest(iHttpService, new_Requests);
+                                                        time_2 = (int)System.currentTimeMillis();
+                                                        break label261;
+                                                    }
+
+                                                    paras = (IParameter)var64.next();
+                                                } while(paras.getType() != 6);
+
+                                                if (key == paras.getName() && value == paras.getValue()) {
+                                                    newBody = newBody + "\"" + paras.getName() + "\":\"" + paras.getValue() + payload + "\",";
+                                                } else {
+                                                    newBody = newBody + "\"" + paras.getName() + "\":\"" + paras.getValue() + "\",";
+                                                }
+                                            }
+                                        }
+                                    } else if (is_add == 2) {
+                                        request_data = request_data.replaceAll("\r", "");
+                                        request_data = request_data.replaceAll("\n", "");
+                                        request_data_temp = request_data.split(",\"");
+                                        String request_data_body = "";
+                                        String request_data_body_temp = "";
+
+                                        for(int i2 = 0; i2 < request_data_temp.length; ++i2) {
+                                            if (i2 != json_count) {
+                                                request_data_body = request_data_body + "\"" + request_data_temp[i2] + ",";
+                                            } else {
+                                                request_data_body_temp = request_data_temp[i2];
+                                                this.stdout.println("准备修改的值：" + request_data_body_temp);
+
+                                                while(request_data_body_temp.contains(":[]")) {
+                                                    this.stdout.println(request_data_body_temp + "跳过");
+                                                    request_data_body = request_data_body + "\"" + request_data_temp[i2] + ",";
+                                                    ++json_count;
+                                                    ++i2;
+                                                    request_data_body_temp = request_data_temp[i2];
+                                                }
+
+                                                if (request_data_body_temp.toLowerCase().contains(":null") || request_data_body_temp.toLowerCase().contains(":true") || request_data_body_temp.toLowerCase().contains(":false")) {
+                                                    this.stdout.println(request_data_body_temp + "跳过");
+                                                    switch_para = true;
+                                                    break;
+                                                }
+
+                                                if (!request_data_body_temp.contains("\":")) {
+                                                    this.stdout.println("处理过，无需处理");
+                                                    switch_para = true;
+                                                    if (para2.getName().equals(para_name)) {
+                                                        this.stdout.println("json嵌套列表，已经处理过第一个值");
+                                                    }
+                                                    break;
+                                                }
+
+                                                if (para2.getName().equals(para_name)) {
+                                                    this.stdout.println("json嵌套列表，这个参数处理过了，跳过");
+                                                    --json_count;
+                                                    switch_para = true;
+                                                    break;
+                                                }
+
+                                                p = Pattern.compile(".*:\\s?\\[?\\s?(.*?$)");
+                                                Matcher m = p.matcher(request_data_body_temp);
+                                                if (m.find()) {
+                                                    request_data_body_temp = m.group(1);
+                                                }
+
+                                                if (request_data_body_temp.contains("\"")) {
+                                                    request_data_body_temp = request_data_temp[i2];
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?\")(.*?)(\"[^\"]*)$", "$1$2" + payload + "$3");
+                                                    this.stdout.println(request_data_body_temp);
+                                                    request_data_body = request_data_body + "\"" + request_data_body_temp + ",";
+                                                } else {
+                                                    request_data_body_temp = request_data_temp[i2];
+                                                    request_data_body_temp = request_data_body_temp.replaceAll("^(.*:.*?)(\\d*)([^\"\\d]*)$", "$1\"$2" + payload + "\"$3");
+                                                    this.stdout.println(request_data_body_temp);
+                                                    request_data_body = request_data_body + "\"" + request_data_body_temp + ",";
+                                                }
+                                            }
+                                        }
+
+                                        if (switch_para) {
+                                            break;
+                                        }
+
+                                        if (para2.getName().equals(para_name)) {
+                                            this.stdout.println("json嵌套列表，已经处理过第一个值!!!!");
+                                        }
+
+                                        request_data_body = request_data_body.substring(0, request_data_body.length() - 1);
+                                        request_data_body = request_data_body.substring(1, request_data_body.length());
+                                        byte[] bodyByte = request_data_body.getBytes();
+                                        byte[] new_Requests = this.helpers.buildHttpMessage(headers, bodyByte);
+                                        time_1 = (int)System.currentTimeMillis();
+                                        requestResponse = this.callbacks.makeHttpRequest(iHttpService, new_Requests);
+                                        time_2 = (int)System.currentTimeMillis();
+                                    }
+                                }
+
+                                if (payload != "'" && payload != "-1" && change != 0) {
+                                    if (payload != "''" && payload != "-0") {
+                                        if (time_2 - time_1 >= 3000) {
+                                            change_sign = "time > 3";
+                                            change_sign_1 = " ✔";
+                                        } else {
+                                            change_sign = "diy payload";
+                                        }
+                                    } else if (change == requestResponse.getResponse().length) {
+                                        change_sign = "";
+                                    } else if ((payload != "''" || requestResponse.getResponse().length != this.original_data_len) && (payload != "-0" || requestResponse.getResponse().length != this.original_data_len)) {
+                                        int var10000 = change - requestResponse.getResponse().length;
+                                        change_sign = "✔ " + var10000;
+                                        change_sign_1 = " ✔";
+                                    } else {
+                                        change_sign = "✔ ==> ?";
+                                        change_sign_1 = " ✔";
+                                    }
+                                } else {
+                                    change = requestResponse.getResponse().length;
+                                    change_sign = "";
+                                }
+
+                                request_data_temp = this.diy_error_text.split("\n");
+                                int var66 = request_data_temp.length;
+
+                                for(int var72 = 0; var72 < var66; ++var72) {
+                                    String keyword = request_data_temp[var72];
+                                    p = Pattern.compile(keyword);
+                                    if (p.matcher(this.helpers.bytesToString(requestResponse.getResponse())).find()) {
+                                        error_sign = " Err";
+                                        change_sign = change_sign + " Err";
+                                        this.log_text.insert(String.valueOf(this.conut - 1) + "-->diy_error:" + keyword + "\n", 0);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        para_name = para2.getName();
+                        this.stdout.println(json_count);
+                    }
+
+                    for(i = 0; i < this.log.size(); ++i) {
+                        if (temp_data.equals(((LogEntry)this.log.get(i)).data_md5)) {
+                            ((LogEntry)this.log.get(i)).setState("end!" + change_sign_1 + error_sign);
+                        }
+                    }
+
+                    this.fireTableDataChanged();
+                    this.logTable.setRowSelectionInterval(this.select_row, this.select_row);
+                    return;
+                }
+
+                para = (IParameter)var42.next();
+            } while(para.getType() != 0 && para.getType() != 1 && para.getType() != 6 && para.getType() != this.is_cookie);
+
+            if (is_add == 0) {
+                is_add = 1;
+            }
+
+            if (para.getType() == 1) {
+                String pattern = "^[a-zA-Z\\s\\d\\.~!@#$%\\^&\\*\\(\\)-_=+\\\\\\{\\}\\]:;\"',/\\?]{1,}$";
+                if (!para.getName().matches(pattern)) {
+                    this.stdout.println("当前url的body为二进制：" + temp_data + "\n");
+                    return;
+                }
+            }
+
+            temp_data = temp_data + "+" + para.getName();
+            if (para.getType() == 6 && request_data == null) {
+                try {
+                    request_data = this.helpers.bytesToString(baseRequestResponse.getRequest()).split("\r\n\r\n")[1];
+                    request_datas = request_data.split("\\{");
+                    if (request_datas.length > 2) {
+                        is_add = 2;
+                    }
+
+                    request_datas = request_data.split("\":\\[");
+                    if (request_datas.length > 1) {
+                        is_add = 2;
+                    }
+                } catch (Exception var37) {
+                    this.stdout.println(var37);
+                }
+            }
+        }
     }
 
-    @Override
     public List<IScanIssue> doActiveScan(IHttpRequestResponse baseRequestResponse, IScannerInsertionPoint insertionPoint) {
         return null;
     }
 
-    @Override
     public int consolidateDuplicateIssues(IScanIssue existingIssue, IScanIssue newIssue) {
-        if (existingIssue.getIssueName().equals(newIssue.getIssueName()))
-            return -1;
-        else return 0;
-    }
-    //
-    // extend AbstractTableModel
-    //
-
-    @Override
-    public int getRowCount()
-    {
-        return log.size();
-
+        return existingIssue.getIssueName().equals(newIssue.getIssueName()) ? -1 : 0;
     }
 
-    @Override
-    public int getColumnCount()
-    {
+    public int getRowCount() {
+        return this.log.size();
+    }
+
+    public int getColumnCount() {
         return 5;
     }
 
-    @Override
-    public String getColumnName(int columnIndex)
-    {
-        switch (columnIndex)
-        {
+    public String getColumnName(int columnIndex) {
+        switch (columnIndex) {
             case 0:
                 return "#";
             case 1:
@@ -984,27 +892,21 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
         }
     }
 
-    @Override
-    public Class<?> getColumnClass(int columnIndex)
-    {
+    public Class<?> getColumnClass(int columnIndex) {
         return String.class;
     }
 
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex)
-    {
-        LogEntry logEntry = log.get(rowIndex);
-
-        switch (columnIndex)
-        {
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        LogEntry logEntry = (LogEntry)this.log.get(rowIndex);
+        switch (columnIndex) {
             case 0:
                 return logEntry.id;
             case 1:
-                return callbacks.getToolName(logEntry.tool);
+                return this.callbacks.getToolName(logEntry.tool);
             case 2:
                 return logEntry.url.toString();
             case 3:
-                return logEntry.requestResponse.getResponse().length;//返回响应包的长度
+                return logEntry.requestResponse.getResponse().length;
             case 4:
                 return logEntry.state;
             default:
@@ -1012,27 +914,56 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
         }
     }
 
+    public byte[] getRequest() {
+        return this.currentlyDisplayedItem.getRequest();
+    }
 
-    //model2
+    public byte[] getResponse() {
+        return this.currentlyDisplayedItem.getResponse();
+    }
+
+    public IHttpService getHttpService() {
+        return this.currentlyDisplayedItem.getHttpService();
+    }
+
+    public static String MD5(String key) {
+        char[] hexDigits = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+        try {
+            byte[] btInput = key.getBytes();
+            MessageDigest mdInst = MessageDigest.getInstance("MD5");
+            mdInst.update(btInput);
+            byte[] md = mdInst.digest();
+            int j = md.length;
+            char[] str = new char[j * 2];
+            int k = 0;
+
+            for(int i = 0; i < j; ++i) {
+                byte byte0 = md[i];
+                str[k++] = hexDigits[byte0 >>> 4 & 15];
+                str[k++] = hexDigits[byte0 & 15];
+            }
+
+            return new String(str);
+        } catch (Exception var10) {
+            return null;
+        }
+    }
+
     class MyModel extends AbstractTableModel {
-
-        @Override
-        public int getRowCount()
-        {
-            return log3.size();
+        MyModel() {
         }
 
-        @Override
-        public int getColumnCount()
-        {
+        public int getRowCount() {
+            return BurpExtender.this.log3.size();
+        }
+
+        public int getColumnCount() {
             return 6;
         }
 
-        @Override
-        public String getColumnName(int columnIndex)
-        {
-            switch (columnIndex)
-            {
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "参数";
                 case 1:
@@ -1050,25 +981,19 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
             }
         }
 
-        @Override
-        public Class<?> getColumnClass(int columnIndex)
-        {
+        public Class<?> getColumnClass(int columnIndex) {
             return String.class;
         }
 
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex)
-        {
-            LogEntry logEntry2 = log3.get(rowIndex);
-
-            switch (columnIndex)
-            {
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            LogEntry logEntry2 = (LogEntry)BurpExtender.this.log3.get(rowIndex);
+            switch (columnIndex) {
                 case 0:
                     return logEntry2.parameter;
                 case 1:
                     return logEntry2.value;
                 case 2:
-                    return logEntry2.requestResponse.getResponse().length;//返回响应包的长度
+                    return logEntry2.requestResponse.getResponse().length;
                 case 3:
                     return logEntry2.change;
                 case 4:
@@ -1081,106 +1006,15 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
         }
     }
 
-
-
-
-    //
-    // implement IMessageEditorController
-    // this allows our request/response viewers to obtain details about the messages being displayed
-    //
-
-    @Override
-    public byte[] getRequest()
-    {
-        return currentlyDisplayedItem.getRequest();
-    }
-
-    @Override
-    public byte[] getResponse()
-    {
-        return currentlyDisplayedItem.getResponse();
-    }
-
-    @Override
-    public IHttpService getHttpService()
-    {
-        return currentlyDisplayedItem.getHttpService();
-    }
-
-    //
-    // extend JTable to handle cell selection
-    //
-
-    private class Table extends JTable
-    {
-        public Table(TableModel tableModel)
-        {
-            super(tableModel);
-        }
-
-        @Override
-        public void changeSelection(int row, int col, boolean toggle, boolean extend)
-        {
-            // show the log entry for the selected row
-            LogEntry logEntry = log.get(row);
-            data_md5_id = logEntry.data_md5;
-            //stdout.println(log_id);//输出目前选中的行数
-            select_row = logEntry.id;
-
-            log3.clear();
-            for (int i = 0; i < log2.size(); i++) {//筛选出目前选中的原始数据包--》衍生出的带有payload的数据包
-                 if(log2.get(i).data_md5==data_md5_id){
-                     log3.add(log2.get(i));
-                 }
-            }
-            //刷新列表界面
-            model.fireTableRowsInserted(log3.size(), log3.size());
-            model.fireTableDataChanged();
-
-            requestViewer.setMessage(logEntry.requestResponse.getRequest(), true);
-            responseViewer.setMessage(logEntry.requestResponse.getResponse(), false);
-            currentlyDisplayedItem = logEntry.requestResponse;
-
-            super.changeSelection(row, col, toggle, extend);
-        }
-    }
-
-    private class Table_log2 extends JTable
-    {
-        public Table_log2(TableModel tableModel)
-        {
-            super(tableModel);
-        }
-
-        @Override
-        public void changeSelection(int row, int col, boolean toggle, boolean extend)
-        {
-
-            // show the log entry for the selected row
-            LogEntry logEntry = log3.get(row);
-            requestViewer.setMessage(logEntry.requestResponse.getRequest(), true);
-            responseViewer.setMessage(logEntry.requestResponse.getResponse(), false);
-            currentlyDisplayedItem = logEntry.requestResponse;
-
-            super.changeSelection(row, col, toggle, extend);
-        }
-    }
-
-    //存放数据包的md5值，用于匹配该数据包已请求过
-    private static class Request_md5
-    {
+    private static class Request_md5 {
         final String md5_data;
 
-        Request_md5(String md5_data)
-        {
+        Request_md5(String md5_data) {
             this.md5_data = md5_data;
         }
     }
-    //
-    // class to hold details of each log entry
-    //
-    private static class LogEntry
-    {
+
+    private static class LogEntry {
         final int id;
         final int tool;
         final IHttpRequestResponsePersisted requestResponse;
@@ -1193,9 +1027,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
         final int response_code;
         String state;
 
-
-        LogEntry(int id,int tool, IHttpRequestResponsePersisted requestResponse, URL url,String parameter,String value,String change,String data_md5,int times,String state,int response_code)
-        {
+        LogEntry(int id, int tool, IHttpRequestResponsePersisted requestResponse, URL url, String parameter, String value, String change, String data_md5, int times, String state, int response_code) {
             this.id = id;
             this.tool = tool;
             this.requestResponse = requestResponse;
@@ -1209,38 +1041,49 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
             this.response_code = response_code;
         }
 
-        public String setState(String state){
+        public String setState(String state) {
             this.state = state;
             return this.state;
         }
     }
 
-    public static String MD5(String key) {
-        char hexDigits[] = {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-        };
-        try {
-            byte[] btInput = key.getBytes();
-            // 获得MD5摘要算法的 MessageDigest 对象
-            MessageDigest mdInst = MessageDigest.getInstance("MD5");
-            // 使用指定的字节更新摘要
-            mdInst.update(btInput);
-            // 获得密文
-            byte[] md = mdInst.digest();
-            // 把密文转换成十六进制的字符串形式
-            int j = md.length;
-            char str[] = new char[j * 2];
-            int k = 0;
-            for (int i = 0; i < j; i++) {
-                byte byte0 = md[i];
-                str[k++] = hexDigits[byte0 >>> 4 & 0xf];
-                str[k++] = hexDigits[byte0 & 0xf];
+    private class Table extends JTable {
+        public Table(TableModel tableModel) {
+            super(tableModel);
+        }
+
+        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+            LogEntry logEntry = (LogEntry)BurpExtender.this.log.get(row);
+            BurpExtender.this.data_md5_id = logEntry.data_md5;
+            BurpExtender.this.select_row = logEntry.id;
+            BurpExtender.this.log3.clear();
+
+            for(int i = 0; i < BurpExtender.this.log2.size(); ++i) {
+                if (((LogEntry)BurpExtender.this.log2.get(i)).data_md5 == BurpExtender.this.data_md5_id) {
+                    BurpExtender.this.log3.add((LogEntry)BurpExtender.this.log2.get(i));
+                }
             }
-            return new String(str);
-        } catch (Exception e) {
-            return null;
+
+            BurpExtender.this.model.fireTableRowsInserted(BurpExtender.this.log3.size(), BurpExtender.this.log3.size());
+            BurpExtender.this.model.fireTableDataChanged();
+            BurpExtender.this.requestViewer.setMessage(logEntry.requestResponse.getRequest(), true);
+            BurpExtender.this.responseViewer.setMessage(logEntry.requestResponse.getResponse(), false);
+            BurpExtender.this.currentlyDisplayedItem = logEntry.requestResponse;
+            super.changeSelection(row, col, toggle, extend);
         }
     }
 
+    private class Table_log2 extends JTable {
+        public Table_log2(TableModel tableModel) {
+            super(tableModel);
+        }
 
+        public void changeSelection(int row, int col, boolean toggle, boolean extend) {
+            LogEntry logEntry = (LogEntry)BurpExtender.this.log3.get(row);
+            BurpExtender.this.requestViewer.setMessage(logEntry.requestResponse.getRequest(), true);
+            BurpExtender.this.responseViewer.setMessage(logEntry.requestResponse.getResponse(), false);
+            BurpExtender.this.currentlyDisplayedItem = logEntry.requestResponse;
+            super.changeSelection(row, col, toggle, extend);
+        }
+    }
 }

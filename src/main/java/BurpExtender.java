@@ -273,7 +273,7 @@ public class BurpExtender extends AbstractTableModel implements IBurpExtender, I
                             BurpExtender.this.stdout.println("关闭 测试Cookie");
                             BurpExtender.this.is_cookie = -1;
                         }
-
+                        在渗透过程中爬虫变得可以操作，完成更多sql和xss漏洞的扫描发现 以因对将来可能应对的金融风险
                     }
                 });
                 btn1.addActionListener(new ActionListener() {
